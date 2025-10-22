@@ -1,957 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shift Selection Form</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            min-height: 100vh;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .form-header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .admin-link {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #3498db;
-            text-decoration: none;
-            font-size: 12px;
-            background: rgba(255,255,255,0.2);
-            padding: 3px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .form-header h1 {
-            font-size: 20px;
-            font-weight: 600;
-        }
-        
-        .form-section {
-            padding: 15px;
-        }
-        
-        .user-info {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .input-group {
-            margin-bottom: 10px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 4px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 14px;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e6ed;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-        
-        .shift-table-container {
-            margin-top: 15px;
-            overflow-x: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .shift-table {
-            width: 100%;
-            min-width: 600px; /* Ensure it can be scrolled on small screens */
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        
-        .shift-table th {
-            background: #3498db;
-            color: white;
-            padding: 8px 6px;
-            font-weight: 600;
-            text-align: center;
-        }
-        
-        .shift-table td {
-            padding: 8px 6px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .shift-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .shift-table tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-        
-        .shift-btn {
-            padding: 6px 10px;
-            margin: 2px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            background: white;
-            color: #3498db;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 60px;
-            font-size: 11px;
-            white-space: nowrap;
-        }
-        
-        .shift-btn:hover:not(:disabled) {
-            background: #3498db;
-            color: white;
-        }
-        
-        .shift-btn.selected {
-            background: #27ae60;
-            color: white;
-            border-color: #27ae60;
-        }
-        
-        .shift-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background 0.3s;
-        }
-        
-        .submit-btn:hover:not(:disabled) {
-            background: #219653;
-        }
-        
-        .submit-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-        }
-        
-        .error-message {
-            color: #e74c3c;
-            text-align: center;
-            margin: 10px 0;
-            font-weight: 600;
-            min-height: 18px;
-            font-size: 13px;
-        }
-        
-        .thank-you-screen {
-            display: none;
-            text-align: center;
-            padding: 30px 15px;
-            background: white;
-        }
-        
-        .thank-you-screen h2 {
-            font-size: 28px;
-            color: #27ae60;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
-        
-        .thank-you-screen p {
-            font-size: 14px;
-            color: #7f8c8d;
-            max-width: 400px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        
-        /* Admin Section Styles */
-        .admin-section {
-            display: none;
-            padding: 15px;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .admin-header h2 {
-            color: #2c3e50;
-            font-size: 18px;
-            flex: 1 1 150px;
-            text-align: center;
-        }
-        
-        .back-link {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 4px 10px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            white-space: nowrap;
-            font-size: 12px;
-        }
-        
-        .admin-password {
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        
-        .admin-password input {
-            padding: 8px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            font-size: 13px;
-            width: 160px;
-            margin-right: 6px;
-        }
-        
-        .admin-password button {
-            padding: 8px 12px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        
-        .submissions-container {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #e0e6ed;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        
-        .submission-item {
-            background: #f8fafc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border-left: 3px solid #3498db;
-        }
-        
-        .submission-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #2c3e50;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        
-        .shifts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 6px;
-        }
-        
-        .shift-item {
-            background: white;
-            padding: 4px;
-            border-radius: 3px;
-            text-align: center;
-            font-size: 11px;
-            border: 1px solid #e0e6ed;
-        }
-        
-        .no-submissions {
-            text-align: center;
-            color: #7f8c8d;
-            font-style: italic;
-            padding: 20px;
-            font-size: 13px;
-        }
-
-        .clear-btn {
-            padding: 8px 16px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: background 0.2s;
-            width: 100%;
-            max-width: 200px;
-            margin: 8px auto 0;
-        }
-
-        .clear-btn:hover {
-            background: #c0392b;
-        }
-        
-        /* Admin stats table */
-        .admin-stats {
-            margin-top: 12px;
-            border: 1px solid #e0e6ed;
-            border-radius: 6px;
-            overflow: hidden;
-            font-size: 11px;
-        }
-        
-        .admin-stats th, .admin-stats td {
-            padding: 6px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .admin-stats th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-        
-        .admin-stats tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .admin-stats tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-        
-        .admin-stats .count-cell {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        /* Export button */
-        .export-btn {
-            padding: 8px 16px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: background 0.2s;
-            width: 100%;
-            max-width: 200px;
-            margin: 8px auto;
-            display: block;
-        }
-        
-        .export-btn:hover {
-            background: #219653;
-        }
-        
-        /* Mobile-specific styles */
-        @media (max-width: 480px) {
-            .container {
-                margin: 0;
-                border-radius: 0;
-            }
-            
-            .form-section {
-                padding: 10px;
-            }
-            
-            .shift-table {
-                font-size: 10px;
-                min-width: 500px;
-            }
-            
-            .shift-table th,
-            .shift-table td {
-                padding: 6px 4px;
-            }
-            
-            .shift-btn {
-                padding: 4px 8px;
-                font-size: 10px;
-                min-width: 50px;
-            }
-            
-            .submit-btn {
-                padding: 10px;
-                font-size: 13px;
-            }
-            
-            .admin-header h2 {
-                font-size: 16px;
-            }
-            
-            .admin-password input {
-                width: 140px;
-                font-size: 12px;
-            }
-            
-            .admin-password button {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-            
-            .export-btn,
-            .clear-btn {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-            
-            .shifts-grid {
-                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-            }
-            
-            .shift-item {
-                font-size: 10px;
-                padding: 3px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shift Selection Form</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#e4edf5 100%);min-height:100vh;padding:10px;display:flex;justify-content:center;align-items:center;overflow-x:hidden}
+    .container{width:100%;max-width:900px;background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.1);overflow:hidden}
+    .form-header{background:#2c3e50;color:#fff;padding:15px;text-align:center;position:relative}
+    .admin-link{position:absolute;top:10px;right:10px;color:#3498db;text-decoration:none;font-size:12px;background:rgba(255,255,255,.2);padding:3px 6px;border-radius:4px;cursor:pointer}
+    .form-header h1{font-size:20px;font-weight:600}
+    .form-section{padding:15px}
+    .user-info{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
+    .input-group{margin-bottom:10px}
+    .input-group label{display:block;margin-bottom:4px;font-weight:600;color:#2c3e50;font-size:14px}
+    .input-group input{width:100%;padding:10px;border:2px solid #e0e6ed;border-radius:6px;font-size:14px;transition:border-color .3s}
+    .input-group input:focus{border-color:#3498db;outline:none}
+    .shift-table-container{margin-top:15px;overflow-x:auto;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05)}
+    .shift-table{width:100%;min-width:600px;border-collapse:collapse;font-size:12px}
+    .shift-table th{background:#3498db;color:#fff;padding:8px 6px;font-weight:600;text-align:center}
+    .shift-table td{padding:8px 6px;text-align:center;border-bottom:1px solid #eee}
+    .shift-table tr:last-child td{border-bottom:none}
+    .shift-table tr:nth-child(even){background:#f8fafc}
+    .shift-btn{padding:6px 10px;margin:2px;border:2px solid #3498db;border-radius:4px;background:#fff;color:#3498db;font-weight:600;cursor:pointer;transition:all .2s;min-width:60px;font-size:11px;white-space:nowrap}
+    .shift-btn:hover:not(:disabled){background:#3498db;color:#fff}
+    .shift-btn.selected{background:#27ae60;color:#fff;border-color:#27ae60}
+    .shift-btn:disabled{opacity:.5;cursor:not-allowed}
+    .submit-btn{display:block;width:100%;padding:12px;background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:background .3s}
+    .submit-btn:hover:not(:disabled){background:#219653}
+    .submit-btn:disabled{background:#bdc3c7;cursor:not-allowed}
+    .error-message{color:#e74c3c;text-align:center;margin:10px 0;font-weight:600;min-height:18px;font-size:13px}
+    .thank-you-screen{display:none;text-align:center;padding:30px 15px;background:#fff}
+    .thank-you-screen h2{font-size:28px;color:#27ae60;margin-bottom:12px;font-weight:700}
+    .thank-you-screen p{font-size:14px;color:#7f8c8d;max-width:400px;margin:0 auto;line-height:1.5}
+    .admin-section{display:none;padding:15px}
+    .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #3498db;flex-wrap:wrap;gap:8px}
+    .admin-header h2{color:#2c3e50;font-size:18px;flex:1 1 150px;text-align:center}
+    .back-link{color:#3498db;text-decoration:none;font-weight:600;padding:4px 10px;border:2px solid #3498db;border-radius:4px;white-space:nowrap;font-size:12px}
+    .admin-password{text-align:center;margin-bottom:12px}
+    .admin-password input{padding:8px;border:2px solid #3498db;border-radius:4px;font-size:13px;width:160px;margin-right:6px}
+    .admin-password button{padding:8px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px}
+    .submissions-container{max-height:300px;overflow-y:auto;border:1px solid #e0e6ed;border-radius:6px;padding:12px;margin-bottom:12px}
+    .submission-item{background:#f8fafc;padding:10px;margin-bottom:10px;border-radius:4px;border-left:3px solid #3498db}
+    .submission-header{display:flex;justify-content:space-between;margin-bottom:6px;font-weight:600;color:#2c3e50;flex-wrap:wrap;gap:6px}
+    .shifts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px}
+    .shift-item{background:#fff;padding:4px;border-radius:3px;text-align:center;font-size:11px;border:1px solid #e0e6ed}
+    .no-submissions{text-align:center;color:#7f8c8d;font-style:italic;padding:20px;font-size:13px}
+    .clear-btn{padding:8px 16px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;transition:background .2s;width:100%;max-width:200px;margin:8px auto 0}
+    .clear-btn:hover{background:#c0392b}
+    .admin-stats{margin-top:12px;border:1px solid #e0e6ed;border-radius:6px;overflow:hidden;font-size:11px}
+    .admin-stats th,.admin-stats td{padding:6px;text-align:center;border-bottom:1px solid #eee}
+    .admin-stats th{background:#f8fafc;font-weight:600}
+    .admin-stats tr:last-child td{border-bottom:none}
+    .admin-stats tr:nth-child(even){background:#f8fafc}
+    .admin-stats .count-cell{font-weight:bold;color:#2c3e50}
+    .export-btn{padding:8px 16px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;transition:background .2s;width:100%;max-width:200px;margin:8px auto;display:none}
+    .export-btn:hover{background:#219653}
+    @media (max-width:480px){.container{margin:0;border-radius:0}.form-section{padding:10px}.shift-table{font-size:10px;min-width:500px}.shift-table th,.shift-table td{padding:6px 4px}.shift-btn{padding:4px 8px;font-size:10px;min-width:50px}.submit-btn{padding:10px;font-size:13px}.admin-header h2{font-size:16px}.admin-password input{width:140px;font-size:12px}.admin-password button{font-size:12px;padding:6px 10px}.export-btn,.clear-btn{font-size:12px;padding:6px 12px}.shifts-grid{grid-template-columns:repeat(auto-fit,minmax(70px,1fr))}.shift-item{font-size:10px;padding:3px}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Main Form -->
-        <div id="main-form">
-            <div class="form-header">
-                <h1>Chatter Availability INHOUSE</h1>
-                <div class="admin-link" onclick="showAdminLogin()">Admin Access</div>
-            </div>
-            
-            <div class="form-section">
-                <div class="user-info">
-                    <div class="input-group">
-                        <label for="username">Email *</label>
-                        <input type="text" id="username" placeholder="Enter your username" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="fullname">Chatter Name (Discord name) *</label>
-                        <input type="text" id="fullname" placeholder="Enter your full name" required>
-                    </div>
-                </div>
-                
-                <div class="error-message" id="error-message"></div>
-                
-                <div class="shift-table-container">
-                    <table class="shift-table">
-                        <thead>
-                            <tr>
-                                <th>Day</th>
-                                <th>Shift 1<br>(5AM-1PM)</th>
-                                <th>Shift 2<br>(1PM-9PM)</th>
-                                <th>Shift 3<br>(9PM-5AM)</th>
-                                <th>Not Available</th>
-                            </tr>
-                        </thead>
-                        <tbody id="shift-table-body">
-                        </tbody>
-                    </table>
-                </div>
-                
-                <button class="submit-btn" id="submit-btn" disabled>Submit Shift Selection</button>
-            </div>
+  <div class="container">
+    <div id="main-form">
+      <div class="form-header">
+        <h1>Chatter Availability INHOUSE</h1>
+        <div class="admin-link" onclick="showAdminLogin()">Admin Access</div>
+      </div>
+      <div class="form-section">
+        <div class="user-info">
+          <div class="input-group">
+            <label for="username">Email *</label>
+            <input type="text" id="username" placeholder="Enter your email" required />
+          </div>
+          <div class="input-group">
+            <label for="fullname">Chatter Name (Discord name) *</label>
+            <input type="text" id="fullname" placeholder="Enter your Discord name" required />
+          </div>
         </div>
-        
-        <!-- Thank You Screen -->
-        <div class="thank-you-screen" id="thank-you-screen">
-            <h2>THANK YOU!</h2>
-            <p>Your shift selections have been successfully submitted.</p>
+        <div class="error-message" id="error-message"></div>
+        <div class="shift-table-container">
+          <table class="shift-table">
+            <thead>
+              <tr>
+                <th>Day</</th>
+                <th>Shift 1<br>(5AM-1PM)</th>
+                <th>Shift 2<br>(1PM-9PM)</th>
+                <th>Shift 3<br>(9PM-5AM)</th>
+                <th>Not Available</th>
+              </tr>
+            </thead>
+            <tbody id="shift-table-body"></tbody>
+          </table>
         </div>
-        
-        <!-- Admin Section -->
-        <div class="admin-section" id="admin-section">
-            <div class="admin-header">
-                <h2>Admin - View Submissions</h2>
-                <a href="#" class="back-link" onclick="showMainForm()">← Back to Form</a>
-            </div>
-            
-            <div class="admin-password">
-                <input type="password" id="admin-password" placeholder="Enter admin password">
-                <button onclick="authenticateAdmin()">Access Submissions</button>
-            </div>
-            
-            <div class="admin-content">
-                <!-- Export Button moved to top -->
-                <button class="export-btn" onclick="exportToCSV()">Export to CSV</button>
-                
-                <div class="submissions-container" id="submissions-container">
-                    <div class="no-submissions">Enter admin password to view submissions</div>
-                </div>
-                
-                <!-- Admin Stats Table -->
-                <div class="admin-stats-container">
-                    <h3 style="margin: 12px 0 6px; color: #2c3e50; font-size: 14px; text-align: center;">Shift Selection Statistics</h3>
-                    <table class="admin-stats" id="admin-stats-table">
-                        <thead>
-                            <tr>
-                                <th>Day</th>
-                                <th>Shift 1</th>
-                                <th>Shift 2</th>
-                                <th>Shift 3</th>
-                                <th>Not Available</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-stats-body">
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Clear Data Button -->
-                <div id="clear-data-section" style="text-align: center; display: none;">
-                    <button class="clear-btn" onclick="clearAllData()">❌ Clear All Data</button>
-                </div>
-            </div>
-        </div>
+        <button class="submit-btn" id="submit-btn" disabled>Submit Shift Selection</button>
+      </div>
     </div>
 
-    <script>
-        // Configuration
-        const MAX_SELECTIONS_PER_SHIFT = 12;
-        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        const SHIFTS = ['Shift 1', 'Shift 2', 'Shift 3', 'Not Available'];
-        const ADMIN_PASSWORD = "bojanalepotica2025"; // Change this to your preferred password
-        
-        // Global variables
-        let userSelections = {};
-        let shiftCounts = {};
-        let currentUser = null;
-        
-        // Initialize the application
-        function init() {
-            loadFromStorage();
-            renderShiftTable();
-            setupEventListeners();
+    <div class="thank-you-screen" id="thank-you-screen">
+      <h2>THANK YOU!</h2>
+      <p>Your shift selections have been successfully submitted.</p>
+    </div>
+
+    <div class="admin-section" id="admin-section">
+      <div class="admin-header">
+        <h2>Admin - View Submissions</h2>
+        <a href="#" class="back-link" onclick="showMainForm()">← Back to Form</a>
+      </div>
+      <div class="admin-password">
+        <input type="password" id="admin-password" placeholder="Enter admin password" />
+        <button onclick="authenticateAdmin()">Access Submissions</button>
+      </div>
+      <div class="admin-content">
+        <button id="export-btn" class="export-btn" onclick="exportToCSV()">Export to CSV</button>
+        <div class="submissions-container" id="submissions-container">
+          <div class="no-submissions">Enter admin password to view submissions</div>
+        </div>
+        <div class="admin-stats-container">
+          <h3 style="margin:12px 0 6px;color:#2c3e50;font-size:14px;text-align:center">Shift Selection Statistics</h3>
+          <table class="admin-stats" id="admin-stats-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Shift 1</th>
+                <th>Shift 2</th>
+                <th>Shift 3</th>
+                <th>Not Available</th>
+              </tr>
+            </thead>
+            <tbody id="admin-stats-body"></tbody>
+          </table>
+        </div>
+        <div id="clear-data-section" style="text-align:center;display:none"><button class="clear-btn" onclick="clearAllData()">❌ Clear All Data</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // --- Firebase (modular SDK) ---
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+    import { getDatabase, ref, get, set, runTransaction } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyBtFrn-fXw3j_cXS3cNyw-S5id0fB6R16s',
+      authDomain: 'chatter-availability.firebaseapp.com',
+      databaseURL: 'https://chatter-availability-default-rtdb.firebaseio.com',
+      projectId: 'chatter-availability',
+      storageBucket: 'chatter-availability.firebasestorage.app',
+      messagingSenderId: '745337333161',
+      appId: '1:745337333161:web:35f7ef01f5637866bf90b8',
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // --- App config ---
+    const MAX_SELECTIONS_PER_SHIFT = 12;
+    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const SHIFTS = ['Shift 1','Shift 2','Shift 3','Not Available'];
+    const ADMIN_PASSWORD = 'bojanalepotica2025';
+
+    // --- State (local during UX) ---
+    let allUsersSelections = {}; // { emailKey: { fullname, Monday: 'Shift 1', ..., timestamp } }
+    let shiftCounts = {};        // { Monday: {Shift 1:n,...} }
+    let stagedSelections = {};   // working copy for current email
+
+    // --- UI bootstrap ---
+    function init() {
+      // render immediately with empty counts
+      ensureCounts();
+      renderShiftTable();
+      setupListeners();
+      // load from Firebase (start), then refresh UI
+      initialLoad();
+    }
+
+    async function initialLoad() {
+      try {
+        const [countsSnap, subsSnap] = await Promise.all([
+          get(ref(db,'shiftCounts')),
+          get(ref(db,'submissions'))
+        ]);
+        const serverCounts = countsSnap.exists() ? countsSnap.val() : {};
+        const serverSubs = subsSnap.exists() ? subsSnap.val() : {};
+        shiftCounts = normalizeCounts(serverCounts);
+        allUsersSelections = serverSubs;
+        // if email typed already, prefill staged
+        handleIdentityChange();
+        renderShiftTable();
+        displayAdminStats();
+      } catch (e) {
+        console.error('Initial Firebase load failed', e);
+        showError('Could not sync with server yet. You can still select shifts.');
+      }
+    }
+
+    // --- Listeners ---
+    function setupListeners(){
+      document.getElementById('submit-btn').addEventListener('click', submitShifts);
+      document.getElementById('username').addEventListener('input', handleIdentityChange);
+      document.getElementById('fullname').addEventListener('input', validateForm);
+    }
+
+    function handleIdentityChange(){
+      const email = getEmail();
+      const key = safeKey(email);
+      if (email && allUsersSelections[key]){
+        const { fullname, timestamp, ...days } = allUsersSelections[key];
+        stagedSelections = { ...days };
+        if (fullname && !document.getElementById('fullname').value){
+          document.getElementById('fullname').value = fullname;
         }
-        
-        // Load data from localStorage
-        function loadFromStorage() {
-            const storedCounts = localStorage.getItem('shiftCounts');
-            const storedSelections = localStorage.getItem('userSelections');
-            
-            if (storedCounts) {
-                shiftCounts = JSON.parse(storedCounts);
-                // Ensure all days and shifts exist
-                DAYS.forEach(day => {
-                    if (!shiftCounts[day]) shiftCounts[day] = {};
-                    SHIFTS.forEach(shift => {
-                        if (shiftCounts[day][shift] === undefined) {
-                            shiftCounts[day][shift] = 0;
-                        }
-                    });
-                });
-            } else {
-                // Initialize shift counts
-                shiftCounts = {};
-                DAYS.forEach(day => {
-                    shiftCounts[day] = {};
-                    SHIFTS.forEach(shift => {
-                        shiftCounts[day][shift] = 0;
-                    });
-                });
+      } else {
+        stagedSelections = {};
+      }
+      renderShiftTable();
+      validateForm();
+    }
+
+    // --- Render ---
+    function renderShiftTable(){
+      const tbody = document.getElementById('shift-table-body');
+      tbody.innerHTML = '';
+      DAYS.forEach(day => {
+        const tr = document.createElement('tr');
+        const dayCell = document.createElement('td');
+        dayCell.textContent = day; tr.appendChild(dayCell);
+        SHIFTS.forEach(shift => {
+          const td = document.createElement('td');
+          const btn = document.createElement('button');
+          btn.className = 'shift-btn';
+          const currentCount = (shiftCounts?.[day]?.[shift]||0);
+          btn.innerHTML = `${shift}<br><small>${currentCount}/${MAX_SELECTIONS_PER_SHIFT}</small>`;
+          if (stagedSelections[day] === shift) btn.classList.add('selected');
+          const atCapacity = currentCount >= MAX_SELECTIONS_PER_SHIFT;
+          if (atCapacity && stagedSelections[day] !== shift){ btn.disabled = true; btn.title='All slots are filled for this shift'; }
+          btn.addEventListener('click', () => onShiftClick(day, shift));
+          td.appendChild(btn); tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function onShiftClick(day, shift){
+      const email = getEmail();
+      if (!email) return showError('Please enter your email and name first');
+      if (stagedSelections[day] === shift) delete stagedSelections[day]; else stagedSelections[day] = shift;
+      renderShiftTable();
+      validateForm();
+    }
+
+    function validateForm(){
+      const email = getEmail();
+      const name = getName();
+      const allDaysChosen = DAYS.every(d => stagedSelections[d]);
+      document.getElementById('submit-btn').disabled = !(email && name && allDaysChosen);
+    }
+
+    // --- Submit (END write to Firebase) ---
+    async function submitShifts(){
+      const email = getEmail();
+      const name = getName();
+      if (!email || !name) return showError('Please fill in all required fields');
+      if (!DAYS.every(d => stagedSelections[d])) return showError('Please select a shift for every day of the week');
+      const key = safeKey(email);
+
+      try {
+        const countsRef = ref(db,'shiftCounts');
+        const txRes = await runTransaction(countsRef, (current) => {
+          const counts = normalizeCounts(current||{});
+          // capacity check vs server counts
+          for (const day of DAYS){
+            const s = stagedSelections[day];
+            if (counts[day][s] >= MAX_SELECTIONS_PER_SHIFT){
+              return; // abort
             }
-            
-            if (storedSelections) {
-                userSelections = JSON.parse(storedSelections);
-            }
-        }
-        
-        // Save data to localStorage
-        function saveToStorage() {
-            localStorage.setItem('shiftCounts', JSON.stringify(shiftCounts));
-            localStorage.setItem('userSelections', JSON.stringify(userSelections));
-        }
-        
-        // Setup event listeners
-        function setupEventListeners() {
-            document.getElementById('submit-btn').addEventListener('click', submitShifts);
-            
-            // Update submit button when inputs change
-            document.getElementById('username').addEventListener('input', validateForm);
-            document.getElementById('fullname').addEventListener('input', validateForm);
-        }
-        
-        // Render the shift selection table
-        function renderShiftTable() {
-            const tbody = document.getElementById('shift-table-body');
-            tbody.innerHTML = '';
-            
-            DAYS.forEach(day => {
-                const row = document.createElement('tr');
-                
-                // Day cell
-                const dayCell = document.createElement('td');
-                dayCell.textContent = day;
-                row.appendChild(dayCell);
-                
-                // Shift cells
-                SHIFTS.forEach(shift => {
-                    const shiftCell = document.createElement('td');
-                    const btn = document.createElement('button');
-                    btn.className = 'shift-btn';
-                    btn.textContent = shift;
-                    btn.dataset.day = day;
-                    btn.dataset.shift = shift;
-                    btn.addEventListener('click', () => handleShiftClick(day, shift));
-                    
-                    // Check if shift is already selected by this user
-                    if (currentUser && userSelections[currentUser] && userSelections[currentUser][day] === shift) {
-                        btn.classList.add('selected');
-                    }
-                    
-                    // Check if shift is full
-                    if (shiftCounts[day][shift] >= MAX_SELECTIONS_PER_SHIFT) {
-                        btn.disabled = true;
-                        // But if this user already selected it, keep it enabled for them to deselect
-                        if (currentUser && userSelections[currentUser] && userSelections[currentUser][day] === shift) {
-                            btn.disabled = false;
-                        }
-                    }
-                    
-                    // Add tooltip for disabled shifts
-                    if (btn.disabled) {
-                        btn.title = "All slots are filled for this shift";
-                    }
-                    
-                    shiftCell.appendChild(btn);
-                    row.appendChild(shiftCell);
-                });
-                
-                tbody.appendChild(row);
-            });
-        }
-        
-        // Handle shift button click
-        function handleShiftClick(day, shift) {
-            // Get current user from form
-            const username = document.getElementById('username').value.trim();
-            if (!username) {
-                showError('Please enter your email and name first');
-                return;
-            }
-            
-            currentUser = username;
-            
-            const currentSelection = userSelections[currentUser]?.[day];
-            
-            if (currentSelection === shift) {
-                // Deselect
-                deselectShift(day, shift);
-            } else {
-                // Select new shift
-                selectShift(day, shift);
-            }
-            
-            renderShiftTable();
-            validateForm();
-        }
-        
-        // Select a shift
-        function selectShift(day, shift) {
-            // Deselect previous shift for this day if exists
-            const previousShift = userSelections[currentUser]?.[day];
-            if (previousShift && previousShift !== shift) {
-                shiftCounts[day][previousShift]--;
-            }
-            
-            // Select new shift
-            if (!userSelections[currentUser]) {
-                userSelections[currentUser] = {};
-            }
-            userSelections[currentUser][day] = shift;
-            shiftCounts[day][shift]++;
-            
-            saveToStorage();
-        }
-        
-        // Deselect a shift
-        function deselectShift(day, shift) {
-            if (userSelections[currentUser] && userSelections[currentUser][day] === shift) {
-                delete userSelections[currentUser][day];
-                shiftCounts[day][shift]--;
-                
-                // Clean up user object if empty
-                if (Object.keys(userSelections[currentUser]).length === 0) {
-                    delete userSelections[currentUser];
-                }
-                
-                saveToStorage();
-            }
-        }
-        
-        // Validate form and update submit button
-        function validateForm() {
-            const username = document.getElementById('username').value.trim();
-            const fullname = document.getElementById('fullname').value.trim();
-            
-            const allDaysSelected = currentUser && DAYS.every(day => 
-                userSelections[currentUser] && userSelections[currentUser][day]
-            );
-            
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = !(username && fullname && allDaysSelected);
-        }
-        
-        // Submit shifts
-        function submitShifts() {
-            const username = document.getElementById('username').value.trim();
-            const fullname = document.getElementById('fullname').value.trim();
-            
-            if (!username || !fullname) {
-                showError('Please fill in all required fields');
-                return;
-            }
-            
-            const allDaysSelected = DAYS.every(day => 
-                userSelections[username] && userSelections[username][day]
-            );
-            
-            if (!allDaysSelected) {
-                showError('Please select a shift for every day of the week');
-                return;
-            }
-            
-            // Save user info with selections
-            if (!userSelections[username]) {
-                userSelections[username] = {};
-            }
-            userSelections[username].fullname = fullname;
-            saveToStorage();
-            
-            // Show thank you screen
-            document.getElementById('main-form').style.display = 'none';
-            document.getElementById('thank-you-screen').style.display = 'block';
-        }
-        
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            setTimeout(() => {
-                errorDiv.textContent = '';
-            }, 5000);
-        }
-        
-        // Admin functions
-        function showAdminLogin() {
-            document.getElementById('main-form').style.display = 'none';
-            document.getElementById('admin-section').style.display = 'block';
-            document.getElementById('admin-password').value = '';
-            document.getElementById('submissions-container').innerHTML = '<div class="no-submissions">Enter admin password to view submissions</div>';
-            document.getElementById('clear-data-section').style.display = 'none'; // Sakrij dugme na početku
-            document.getElementById('admin-stats-body').innerHTML = '';
-        }
-        
-        function showMainForm() {
-            document.getElementById('admin-section').style.display = 'none';
-            document.getElementById('main-form').style.display = 'block';
-        }
-        
-        function authenticateAdmin() {
-            const password = document.getElementById('admin-password').value;
-            const clearSection = document.getElementById('clear-data-section');
-            
-            if (password === ADMIN_PASSWORD) {
-                displaySubmissions();
-                displayAdminStats();
-                clearSection.style.display = 'block'; // Prikaži SAMO ako je lozinka tačna
-            } else {
-                document.getElementById('submissions-container').innerHTML = '<div class="no-submissions" style="color: #e74c3c;">Incorrect password. Please try again.</div>';
-                clearSection.style.display = 'none';
-                document.getElementById('admin-stats-body').innerHTML = '';
-            }
-        }
-        
-        function displaySubmissions() {
-            const container = document.getElementById('submissions-container');
-            const submissions = JSON.parse(localStorage.getItem('userSelections') || '{}');
-            
-            if (Object.keys(submissions).length === 0) {
-                container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
-                return;
-            }
-            
-            let html = '';
-            for (const [username, data] of Object.entries(submissions)) {
-                // Skip if it's not a real user entry (e.g., accidental top-level fullname)
-                if (typeof data !== 'object' || data === null) continue;
-                
-                const fullname = data.fullname || 'N/A';
-                html += `
-                    <div class="submission-item">
-                        <div class="submission-header">
-                            <span>Username: ${username}</span>
-                            <span>Name: ${fullname}</span>
-                        </div>
-                        <div class="shifts-grid">
-                `;
-                
-                DAYS.forEach(day => {
-                    const shift = data[day] || 'Not selected';
-                    html += `<div class="shift-item"><strong>${day}:</strong> ${shift}</div>`;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-        }
-        
-        function displayAdminStats() {
-            const tbody = document.getElementById('admin-stats-body');
-            tbody.innerHTML = '';
-            
-            DAYS.forEach(day => {
-                const row = document.createElement('tr');
-                
-                const dayCell = document.createElement('td');
-                dayCell.textContent = day;
-                row.appendChild(dayCell);
-                
-                SHIFTS.forEach(shift => {
-                    const countCell = document.createElement('td');
-                    countCell.className = 'count-cell';
-                    countCell.textContent = `${shiftCounts[day][shift]}/${MAX_SELECTIONS_PER_SHIFT}`;
-                    row.appendChild(countCell);
-                });
-                
-                tbody.appendChild(row);
-            });
+          }
+          // adjust for previous selection of this user if exists
+          const prev = (allUsersSelections[key] || {});
+          for (const day of DAYS){
+            const newS = stagedSelections[day];
+            const oldS = prev[day];
+            if (oldS && oldS !== newS){ counts[day][oldS] = Math.max(0,(counts[day][oldS]||0)-1); }
+            counts[day][newS] = (counts[day][newS]||0) + 1;
+          }
+          return counts;
+        }, { applyLocally:false });
+
+        if (!txRes.committed){
+          await initialLoad();
+          return showError('One or more selected shifts just filled up. Please adjust and try again.');
         }
 
-        // ✅ Funkcija za brisanje SVIH podataka — dostupna SAMO nakon autentifikacije
-        function clearAllData() {
-            if (confirm("Are you sure you want to delete ALL shift data? This cannot be undone.")) {
-                localStorage.removeItem('shiftCounts');
-                localStorage.removeItem('userSelections');
-                
-                // Reset global variables
-                shiftCounts = {};
-                userSelections = {};
-                currentUser = null;
-                
-                // Re-initialize shiftCounts
-                DAYS.forEach(day => {
-                    shiftCounts[day] = {};
-                    SHIFTS.forEach(shift => {
-                        shiftCounts[day][shift] = 0;
-                    });
-                });
-                
-                // Update UI
-                displaySubmissions(); // Shows "No submissions"
-                displayAdminStats();  // Update stats
-                renderShiftTable();   // Refreshes main table
-                
-                // Clear form fields if visible
-                if (document.getElementById('main-form').style.display !== 'none') {
-                    document.getElementById('username').value = '';
-                    document.getElementById('fullname').value = '';
-                    validateForm();
-                }
-                
-                alert("✅ All data has been cleared successfully!");
-            }
-        }
-        
-        // Export to CSV function
-        function exportToCSV() {
-            const submissions = JSON.parse(localStorage.getItem('userSelections') || '{}');
-            
-            if (Object.keys(submissions).length === 0) {
-                alert("No submissions to export!");
-                return;
-            }
-            
-            // Create CSV header
-            let csvContent = "Name";
-            DAYS.forEach(day => {
-                csvContent += `,${day}`;
-            });
-            csvContent += "\n";
-            
-            // Add each user's data
-            for (const [username, data] of Object.entries(submissions)) {
-                if (typeof data !== 'object' || data === null) continue;
-                
-                const fullname = data.fullname || username;
-                csvContent += `"${fullname}"`;
-                
-                DAYS.forEach(day => {
-                    const shift = data[day] || '';
-                    csvContent += `,"${shift}"`;
-                });
-                csvContent += "\n";
-            }
-            
-            // Create download link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "shift_submissions.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        
-        // Initialize when page loads
-        window.onload = init;
-    </script>
+        // write submission
+        const payload = { fullname: name, timestamp: Date.now() };
+        DAYS.forEach(d => payload[d] = stagedSelections[d]);
+        await set(ref(db,'submissions/'+key), payload);
+
+        // update local caches for UI
+        shiftCounts = txRes.snapshot.val();
+        allUsersSelections[key] = payload;
+
+        // thanks screen
+        document.getElementById('main-form').style.display='none';
+        document.getElementById('thank-you-screen').style.display='block';
+      } catch (e){
+        console.error('Submit error', e);
+        showError('Unexpected error while saving. Please try again.');
+      }
+    }
+
+    // --- Admin ---
+    window.showAdminLogin = function(){
+      document.getElementById('main-form').style.display='none';
+      document.getElementById('admin-section').style.display='block';
+      document.getElementById('admin-password').value='';
+      document.getElementById('submissions-container').innerHTML='<div class="no-submissions">Enter admin password to view submissions</div>';
+      document.getElementById('clear-data-section').style.display='none';
+      document.getElementById('admin-stats-body').innerHTML='';
+      document.getElementById('export-btn').style.display='none';
+    }
+
+    window.showMainForm = function(){
+      document.getElementById('admin-section').style.display='none';
+      document.getElementById('main-form').style.display='block';
+      document.getElementById('export-btn').style.display='none';
+    }
+
+    window.authenticateAdmin = function(){
+      const pwd = document.getElementById('admin-password').value;
+      const clearSec = document.getElementById('clear-data-section');
+      if (pwd === ADMIN_PASSWORD){
+        displaySubmissions();
+        displayAdminStats();
+        clearSec.style.display='block';
+        document.getElementById('export-btn').style.display='block';
+      } else {
+        document.getElementById('submissions-container').innerHTML='<div class="no-submissions" style="color:#e74c3c;">Incorrect password. Please try again.</div>';
+        clearSec.style.display='none';
+        document.getElementById('admin-stats-body').innerHTML='';
+        document.getElementById('export-btn').style.display='none';
+      }
+    }
+
+    function displaySubmissions(){
+      const cont = document.getElementById('submissions-container');
+      const subs = allUsersSelections || {};
+      if (Object.keys(subs).length===0){ cont.innerHTML='<div class="no-submissions">No submissions yet.</div>'; return; }
+      let html='';
+      for (const [userKey, data] of Object.entries(subs)){
+        if (typeof data !== 'object' || data===null) continue;
+        const name = data.fullname || 'N/A';
+        const ts = data.timestamp ? new Date(data.timestamp).toLocaleString() : '—';
+        html += `<div class="submission-item">`+
+                `<div class="submission-header"><span>Username: ${unsafekey(userKey)}</span><span>Name: ${escapeHtml(name)}</span><span>Submitted: ${escapeHtml(ts)}</span></div>`+
+                `<div class="shifts-grid">`;
+        DAYS.forEach(d => { const s = data[d] || 'Not selected'; html += `<div class="shift-item"><strong>${d}:</strong> ${escapeHtml(s)}</div>`; });
+        html += `</div></div>`;
+      }
+      cont.innerHTML = html;
+    }
+
+    function displayAdminStats(){
+      const tbody = document.getElementById('admin-stats-body');
+      tbody.innerHTML='';
+      DAYS.forEach(day => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${day}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 1']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 2']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 3']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Not Available']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.clearAllData = async function(){
+      if (!confirm('Are you sure you want to delete ALL shift data? This cannot be undone.')) return;
+      await set(ref(db,'shiftCounts'), null);
+      await set(ref(db,'submissions'), null);
+      allUsersSelections = {};
+      shiftCounts = normalizeCounts({});
+      renderShiftTable();
+      displayAdminStats();
+      document.getElementById('submissions-container').innerHTML='<div class="no-submissions">No submissions yet.</div>';
+      alert('✅ All data has been cleared successfully!');
+    }
+
+    window.exportToCSV = function(){
+      const subs = allUsersSelections || {};
+      if (Object.keys(subs).length===0){ alert('No submissions to export!'); return; }
+      let csv = 'Name,Email,Timestamp';
+      DAYS.forEach(d => csv += `,${d}`); csv += '\n';
+      for (const [userKey, data] of Object.entries(subs)){
+        if (typeof data !== 'object' || data===null) continue;
+        const email = unsafekey(userKey);
+        const name = data.fullname || email;
+        const tsISO = data.timestamp ? new Date(data.timestamp).toISOString() : '';
+        csv += `"${name}","${email}","${tsISO}"`;
+        DAYS.forEach(d => csv += `,"${data[d]||''}"`);
+        csv += '\n';
+      }
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='shift_submissions.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // --- helpers ---
+    function ensureCounts(){ shiftCounts = normalizeCounts(shiftCounts||{}); }
+    function normalizeCounts(obj){
+      const counts = obj || {}; DAYS.forEach(d=>{ counts[d] = counts[d] || {}; SHIFTS.forEach(s=>{ if(typeof counts[d][s] !== 'number') counts[d][s]=0; }); }); return counts;
+    }
+    function getEmail(){ return (document.getElementById('username').value||'').trim(); }
+    function getName(){ return (document.getElementById('fullname').value||'').trim(); }
+    function safeKey(k){ return (k||'').replace(/[.#$\[\]]/g,'_'); }
+    function unsafekey(k){ return (k||'').replace(/_/g,'.'); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+    window.addEventListener('load', init);
+  </script>
 </body>
 </html>
