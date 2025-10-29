@@ -83,7 +83,7 @@
           <table class="shift-table">
             <thead>
               <tr>
-                <th>Day</</th>
+                <th>Day</th>
                 <th>Shift 1<br>(5AM-1PM)</th>
                 <th>Shift 2<br>(1PM-9PM)</th>
                 <th>Shift 3<br>(9PM-5AM)</th>
@@ -155,10 +155,15 @@
     const db = getDatabase(app);
 
     // --- App config ---
-    const MAX_SELECTIONS_PER_SHIFT = 12;
     const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     const SHIFTS = ['Shift 1','Shift 2','Shift 3','Not Available'];
     const ADMIN_PASSWORD = 'bojanalepotica2025';
+    const MAX_SELECTIONS = {
+      'Shift 1': 11,
+      'Shift 2': 11,
+      'Shift 3': 11,
+      'Not Available': 7
+    };
 
     // --- State (local during UX) ---
     let allUsersSelections = {}; // { emailKey: { fullname, Monday: 'Shift 1', ..., timestamp } }
@@ -167,11 +172,9 @@
 
     // --- UI bootstrap ---
     function init() {
-      // render immediately with empty counts
       ensureCounts();
       renderShiftTable();
       setupListeners();
-      // load from Firebase (start), then refresh UI
       initialLoad();
     }
 
@@ -185,7 +188,6 @@
         const serverSubs = subsSnap.exists() ? subsSnap.val() : {};
         shiftCounts = normalizeCounts(serverCounts);
         allUsersSelections = serverSubs;
-        // if email typed already, prefill staged
         handleIdentityChange();
         renderShiftTable();
         displayAdminStats();
@@ -231,10 +233,13 @@
           const btn = document.createElement('button');
           btn.className = 'shift-btn';
           const currentCount = (shiftCounts?.[day]?.[shift]||0);
-          btn.innerHTML = `${shift}<br><small>${currentCount}/${MAX_SELECTIONS_PER_SHIFT}</small>`;
+          btn.innerHTML = `${shift}<br><small>${currentCount}/${MAX_SELECTIONS[shift]}</small>`;
           if (stagedSelections[day] === shift) btn.classList.add('selected');
-          const atCapacity = currentCount >= MAX_SELECTIONS_PER_SHIFT;
-          if (atCapacity && stagedSelections[day] !== shift){ btn.disabled = true; btn.title='All slots are filled for this shift'; }
+          const atCapacity = currentCount >= MAX_SELECTIONS[shift];
+          if (atCapacity && stagedSelections[day] !== shift){ 
+            btn.disabled = true; 
+            btn.title='All slots are filled for this shift'; 
+          }
           btn.addEventListener('click', () => onShiftClick(day, shift));
           td.appendChild(btn); tr.appendChild(td);
         });
@@ -254,16 +259,22 @@
       const email = getEmail();
       const name = getName();
       const allDaysChosen = DAYS.every(d => stagedSelections[d]);
-      document.getElementById('submit-btn').disabled = !(email && name && allDaysChosen);
+      const key = safeKey(email);
+      const alreadySubmitted = email && allUsersSelections[key] && Object.keys(allUsersSelections[key]).length > 0;
+      document.getElementById('submit-btn').disabled = !(email && name && allDaysChosen && !alreadySubmitted);
     }
 
     // --- Submit (END write to Firebase) ---
     async function submitShifts(){
       const email = getEmail();
       const name = getName();
+      const key = safeKey(email);
+
       if (!email || !name) return showError('Please fill in all required fields');
       if (!DAYS.every(d => stagedSelections[d])) return showError('Please select a shift for every day of the week');
-      const key = safeKey(email);
+      if (allUsersSelections[key] && Object.keys(allUsersSelections[key]).length > 0) {
+        return showError('You have already submitted your availability. Contact admin if you need to update it.');
+      }
 
       try {
         const countsRef = ref(db,'shiftCounts');
@@ -272,7 +283,7 @@
           // capacity check vs server counts
           for (const day of DAYS){
             const s = stagedSelections[day];
-            if (counts[day][s] >= MAX_SELECTIONS_PER_SHIFT){
+            if (counts[day][s] >= MAX_SELECTIONS[s]){
               return; // abort
             }
           }
@@ -368,10 +379,10 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${day}</td>
-          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 1']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
-          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 2']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
-          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 3']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>
-          <td class="count-cell">${(shiftCounts?.[day]?.['Not Available']||0)}/${MAX_SELECTIONS_PER_SHIFT}</td>`;
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 1']||0)}/${MAX_SELECTIONS['Shift 1']}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 2']||0)}/${MAX_SELECTIONS['Shift 2']}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Shift 3']||0)}/${MAX_SELECTIONS['Shift 3']}</td>
+          <td class="count-cell">${(shiftCounts?.[day]?.['Not Available']||0)}/${MAX_SELECTIONS['Not Available']}</td>`;
         tbody.appendChild(tr);
       });
     }
@@ -416,7 +427,8 @@
     function getName(){ return (document.getElementById('fullname').value||'').trim(); }
     function safeKey(k){ return (k||'').replace(/[.#$\[\]]/g,'_'); }
     function unsafekey(k){ return (k||'').replace(/_/g,'.'); }
-    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'<','>':'>','"':'&quot;'}[c])); }
+    function showError(msg){ document.getElementById('error-message').textContent = msg; }
 
     window.addEventListener('load', init);
   </script>
